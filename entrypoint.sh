@@ -38,7 +38,7 @@ edits="\`$short_sha\` ($(date +'%m %d %Y'))"
 
 if [[ "${up_to_date}" -eq 0 ]]; then
   git_cmd git checkout -b "${pr_branch}" --track "origin/${INPUT_BRANCH}"
-  git_cmd git merge --no-edit "upstream/${INPUT_UPSTREAM_BRANCH}" -m "Merge remote-tracking branch 'gnu/master' into master"
+  git_cmd git merge --no-edit "upstream/${INPUT_UPSTREAM_BRANCH}" -m \"Merge remote-tracking branch 'gnu/master' into master\"
   sed -i -r "s/^(The last merged commit is).*/\1 $edits/" README.md
   git_cmd git add README.md
   git_cmd git commit --amend --no-edit
