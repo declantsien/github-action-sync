@@ -26,7 +26,7 @@ git_cmd() {
 
 git_setup
 git_cmd git remote add upstream ${INPUT_UPSTREAM}
-git_cmd git fetch upstream ${INPUT_UPSTREAM_BRANCH}
+git_cmd git fetch --all
 
 last_sha=$(git_cmd git rev-list -1 upstream/${INPUT_UPSTREAM_BRANCH})
 short_sha=${last_sha:0:10}
