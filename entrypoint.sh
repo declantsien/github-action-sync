@@ -26,16 +26,22 @@ git_cmd() {
 
 git_setup
 git_cmd git remote add upstream ${INPUT_UPSTREAM}
-git_cmd git fetch --all
+git_cmd git fetch upstream ${INPUT_UPSTREAM_BRANCH}
 
 last_sha=$(git_cmd git rev-list -1 upstream/${INPUT_UPSTREAM_BRANCH})
+short_sha=${last_sha:0:10}
 echo "Last commited SHA: ${last_sha}"
 
 up_to_date=$(git_cmd git rev-list origin/${INPUT_BRANCH} | grep ${last_sha} | wc -l)
-pr_branch="up-${last_sha}"
+pr_branch="pull-upstream-${last_sha:0:10}"
+edits="\`$short_sha\` ($(date +'%m %d %Y'))"
 
 if [[ "${up_to_date}" -eq 0 ]]; then
-  git_cmd git checkout -b "${pr_branch}" --track "upstream/${INPUT_UPSTREAM_BRANCH}"
+  git_cmd git checkout -b "${pr_branch}" --track "origin/${INPUT_BRANCH}"
+  git_cmd git merge --no-edit "upstream/${INPUT_UPSTREAM_BRANCH}" -m "Merge remote-tracking branch 'gnu/master' into master"
+  sed -i -r "s/^(The last merged commit is).*/\1 $edits/" README.md
+  git_cmd git add README.md
+  git_cmd git commit --amend --no-edit
   git_cmd git push -u origin "${pr_branch}"
   git_cmd git remote remove upstream
 
@@ -46,7 +52,7 @@ if [[ "${up_to_date}" -eq 0 ]]; then
     echo "PR Already exists!!!"
     exit 0
   else
-    git_cmd hub pull-request -b "${INPUT_BRANCH}" -h "${pr_branch}" -l "${INPUT_PR_LABELS}" -a "${GITHUB_ACTOR}" -m "\"Upstream: ${last_sha}\""
+    git_cmd hub pull-request -b "${INPUT_BRANCH}" -h "${pr_branch}" -l "${INPUT_PR_LABELS}" -a "${GITHUB_ACTOR}" -m "\"Merge upstream: ${short_sha}\""
   fi
 else
   echo "Branch up-to-date"
