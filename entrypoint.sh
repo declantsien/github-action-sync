@@ -34,7 +34,7 @@ echo "Last commited SHA: ${last_sha}"
 
 up_to_date=$(git_cmd git rev-list origin/${INPUT_BRANCH} | grep ${last_sha} | wc -l)
 pr_branch="pull-upstream-${last_sha:0:10}"
-edits="\`$short_sha\` ($(date +'%m %d %Y'))"
+edits="\`$short_sha\` ($(date +'%m %d %Y'))."
 
 if [[ "${up_to_date}" -eq 0 ]]; then
   git_cmd git checkout -b "${pr_branch}" --track "origin/${INPUT_BRANCH}"
